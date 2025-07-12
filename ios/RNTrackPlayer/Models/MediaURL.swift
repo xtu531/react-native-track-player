@@ -9,29 +9,48 @@
 import Foundation
 
 struct MediaURL {
-    let value: URL
-    let isLocal: Bool
-    private let originalObject: Any
-    
-    init?(object: Any?) {
-        guard let object = object else { return nil }
-        originalObject = object
-        
-        // This is based on logic found in RCTConvert NSURLRequest, 
-        // and uses RCTConvert NSURL to create a valid URL from various formats
-        if let localObject = object as? [String: Any] {
-            var url = localObject["uri"] as? String ?? localObject["url"] as! String
-            
-            if let bundleName = localObject["bundle"] as? String {
-                url = String(format: "%@.bundle/%@", bundleName, url)
-            }
-            
-            isLocal = url.lowercased().hasPrefix("http") ? false : true
-            value = RCTConvert.nsurl(url)
-        } else {
-            let url = object as! String
-            isLocal = url.lowercased().hasPrefix("file://")
-            value = RCTConvert.nsurl(url)
-        }
+  let value: URL
+  let isLocal: Bool
+  private let originalObject: Any
+
+  init?(object: Any?) {
+    guard let object = object else { return nil }
+    originalObject = object
+
+    // This is based on logic found in RCTConvert NSURLRequest,
+    // and uses RCTConvert NSURL to create a valid URL from various formats
+    // if let localObject = object as? [String: Any] {
+    //     var url = localObject["uri"] as? String ?? localObject["url"] as! String
+
+    //     if let bundleName = localObject["bundle"] as? String {
+    //         url = String(format: "%@.bundle/%@", bundleName, url)
+    //     }
+
+    //     isLocal = url.lowercased().hasPrefix("http") ? false : true
+    //     value = RCTConvert.nsurl(url)
+    // } else {
+    //     let url = object as! String
+    //     isLocal = url.lowercased().hasPrefix("file://")
+    //     value = RCTConvert.nsurl(url)
+    // }
+
+    var urlString: String?
+
+    if let localObject = object as? [String: Any] {
+      urlString = localObject["uri"] as? String ?? localObject["url"] as? String
+      if let bundleName = localObject["bundle"] as? String, let url = urlString {
+        urlString = String(format: "%@.bundle/%@", bundleName, url)
+      }
+    } else if let str = object as? String {
+      urlString = str
     }
+
+    guard let urlStr = urlString, let parsed = URL(string: urlStr) else {
+      print("⚠️ MediaURL 解析失败: 无效的 URL 字符串")
+      return nil
+    }
+
+    self.isLocal = !(parsed.scheme?.lowercased().hasPrefix("http") ?? false)
+    self.value = parsed
+  }
 }
