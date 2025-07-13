@@ -128,11 +128,12 @@ class Track: AudioItem, TimePitching, AssetOptionsProviding {
         if let headers = headers {
             options["AVURLAssetHTTPHeaderFieldsKey"] = headers
         }
-        if #available(iOS 16, *) {
+        if #available(iOS 15, *) {
             if let userAgent = userAgent {
                 // there is now an official, working way to set the user-agent for every request
                 // https://developer.apple.com/documentation/avfoundation/avurlassethttpuseragentkey
                 options[AVURLAssetHTTPUserAgentKey] = userAgent
+                options["AVURLAssetOutOfBandMIMETypeKey"] = "audio/mpeg"
             }
         }
         return options
