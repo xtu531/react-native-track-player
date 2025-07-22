@@ -132,7 +132,7 @@ class Track: AudioItem, TimePitching, AssetOptionsProviding {
             if let userAgent = userAgent {
                 // there is now an official, working way to set the user-agent for every request
                 // https://developer.apple.com/documentation/avfoundation/avurlassethttpuseragentkey
-                options[AVURLAssetHTTPUserAgentKey] = userAgent
+                options["AVURLAssetHTTPUserAgentKey"] = userAgent
                 options["AVURLAssetOutOfBandMIMETypeKey"] = "audio/mpeg"
             }
         }
